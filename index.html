@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ab1c21">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Mapa do Shopping | Master Shopping Atacadista</title>
+    <link rel="preload" href="fonts/cg400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="IMG/mapaMaster14.09.svg" as="fetch" type="image/svg+xml" crossorigin>
+    <link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+    <header id="header">
+        <img src="IMG/LogoMasterHorizontal.png" alt="Master Shopping Atacadista" class="logo-shopping">
+    </header>
+
+    <!-- FILTRO POR CATEGORIA (os botões são criados pelo script) -->
+    <nav class="filtros" id="filtros" aria-label="Filtrar lojas por categoria" hidden></nav>
+
+    <main id="viewport">
+        <div class="map-frame" id="mapaFrame">
+            <!-- O SVG é injetado aqui pelo script (para usar as fontes do site e dar zoom em vetor).
+                 Se o script falhar, esta imagem aparece no lugar. -->
+            <img src="IMG/mapaMaster14.09.svg" alt="Mapa do Master Shopping" class="map-fallback" draggable="false">
+        </div>
+
+        <div class="map-controls" id="mapControls">
+            <button class="ctrl-btn" id="btnFullscreen" aria-label="Tela cheia">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            </button>
+            <button class="ctrl-btn" id="btnZoomIn" aria-label="Aumentar zoom">+</button>
+            <button class="ctrl-btn" id="btnZoomOut" aria-label="Diminuir zoom">−</button>
+        </div>
+    </main>
+
+    <footer class="action-zone" id="actionZone">
+        <button class="download-button" id="btnDownload">
+            <img src="IMG/iconeDownload.png" alt="" class="download-icon">
+            <span>Baixar Mapa em PNG</span>
+        </button>
+    </footer>
+
+    <script src="script.js?v=4"></script>
+</body>
+</html>
