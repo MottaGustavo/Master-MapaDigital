@@ -9,3 +9,5 @@ Mapa interativo do Master Shopping Atacadista (zoom, arrastar, tela cheia e down
 - **Filtro por categoria:** os botões acima do mapa (e as linhas da legenda dentro do mapa) destacam só as lojas daquela categoria.
   As categorias e cores ficam em `CATEGORIAS`, no início do `script.js`. Fitness e Pijamas e Lingerie usam a mesma cor no SVG, então hoje destacam as mesmas lojas.
 - **Se o SVG não carregar** (ex.: pasta `fonts/` ou arquivo faltando, ou abrindo direto do disco), o mapa usa a imagem simples e o zoom continua funcionando.
+
+link provisório: mottagustavo.github.io/Master-MapaDigital
