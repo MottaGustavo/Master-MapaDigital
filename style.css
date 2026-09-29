@@ -1,0 +1,267 @@
+/* ==========================================================
+   1. FONTES DO MAPA (extraídas do próprio SVG original)
+   ========================================================== */
+@font-face { font-family: "Century Gothic"; src: url("fonts/cg400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Century Gothic"; src: url("fonts/cg700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Arial";          src: url("fonts/arial400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+
+/* Letras que não vieram no SVG (ex.: minúsculas da legenda) usam uma sans parecida com a Arial,
+   em vez de depender da fonte que cada aparelho escolher */
+.map-frame svg tspan[font-family^="Arial"] {
+    font-family: "Arial", "Helvetica Neue", Helvetica, "Liberation Sans", Roboto, sans-serif;
+}
+
+/* ==========================================================
+   2. BASE
+   ========================================================== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+}
+
+/* ==========================================================
+   3. HEADER
+   ========================================================== */
+header {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: max(10px, env(safe-area-inset-top, 0px)) 16px 10px;
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    position: relative;
+    z-index: 20;
+}
+
+.logo-shopping {
+    height: 40px;
+    width: auto;
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+
+/* ==========================================================
+   3b. FILTRO POR CATEGORIA
+   ========================================================== */
+.filtros {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    position: relative;
+    z-index: 15;
+}
+.filtros[hidden] { display: none; }
+.filtros::-webkit-scrollbar { display: none; }
+
+.chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    color: #1e293b;
+    font: 600 13px/1 inherit;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.chip i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cor, #94a3b8);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.chip:hover { border-color: #94a3b8; }
+.chip[aria-pressed="true"] {
+    background: #1e293b;
+    border-color: #1e293b;
+    color: #ffffff;
+}
+.chip:focus-visible { outline: 3px solid #1e293b; outline-offset: 2px; }
+
+/* ==========================================================
+   4. ÁREA DO MAPA
+   ========================================================== */
+main {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    padding: 12px;
+    touch-action: none;
+}
+
+.map-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.14);
+    cursor: grab;
+    touch-action: none;
+}
+
+.map-frame.grabbing { cursor: grabbing; }
+
+.map-frame > svg,
+.map-fallback {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+
+/* Renderização nítida do texto do mapa */
+.map-frame svg {
+    text-rendering: geometricPrecision;
+    shape-rendering: geometricPrecision;
+}
+
+/* ==========================================================
+   5. CONTROLES (tela cheia, zoom)
+   ========================================================== */
+.map-controls {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.ctrl-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.18);
+    font-size: 22px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #1e293b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.ctrl-btn:hover  { background: #ffffff; }
+.ctrl-btn:active { background: #f1f5f9; transform: scale(0.92); }
+
+/* ==========================================================
+   6. BOTÃO DE DOWNLOAD (barra própria, não cobre o mapa)
+   ========================================================== */
+.action-zone {
+    flex-shrink: 0;
+    padding: 4px 16px max(14px, env(safe-area-inset-bottom, 0px));
+}
+
+.download-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    background: #ab1c21;
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 8px 18px -4px rgba(171, 28, 33, 0.35);
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.download-button:hover    { background: #971a1e; }
+.download-button:active   { background: #871418; transform: scale(0.97); }
+.download-button:disabled { opacity: 0.7; cursor: wait; }
+
+.download-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.ctrl-btn:focus-visible,
+.download-button:focus-visible {
+    outline: 3px solid #1e293b;
+    outline-offset: 2px;
+}
+
+/* ==========================================================
+   7. TELA CHEIA
+   ========================================================== */
+body.fullscreen header,
+body.fullscreen .filtros,
+body.fullscreen .action-zone { display: none; }
+
+body.fullscreen main { padding: 0; }
+
+body.fullscreen .map-frame {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+body.fullscreen .map-controls {
+    bottom: max(24px, env(safe-area-inset-bottom, 24px));
+}
+
+/* ==========================================================
+   8. CELULAR: mapa ocupa a largura toda
+   ========================================================== */
+@media (max-width: 640px) {
+    main { padding: 0; }
+    .map-frame { border-radius: 0; box-shadow: none; }
+    .map-controls { right: 12px; bottom: 12px; }
+    .logo-shopping { height: 34px; }
+}
+
+/* Imagem simples (usada só se o SVG não carregar): o zoom é feito por transform */
+.map-fallback { transform-origin: 0 0; }
+
+/* Aviso quando o filtro não pode ser montado */
+.filtros.aviso { display: block; padding: 8px 14px; font-size: 12px; color: #7a1216; background: #fdecec; }
