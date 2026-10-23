@@ -11,7 +11,7 @@
 (() => {
     'use strict';
 
-    const SVG_URL = 'IMG/mapaMaster14.09.svg';
+    const SVG_URL = 'IMG/mapa-master-23-10.svg';
     const FONTES = [
         { familia: 'Century Gothic', peso: 400, url: 'fonts/cg400.woff2' },
         { familia: 'Century Gothic', peso: 700, url: 'fonts/cg700.woff2' },
