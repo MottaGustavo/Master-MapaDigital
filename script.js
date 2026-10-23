@@ -11,11 +11,11 @@
 (() => {
     'use strict';
 
-    const SVG_URL  = 'IMG/mapaMaster14.09.svg';
-    const FONTES   = [
+    const SVG_URL = 'IMG/mapaMaster14.09.svg';
+    const FONTES = [
         { familia: 'Century Gothic', peso: 400, url: 'fonts/cg400.woff2' },
         { familia: 'Century Gothic', peso: 700, url: 'fonts/cg700.woff2' },
-        { familia: 'Arial',          peso: 400, url: 'fonts/arial400.woff2' },
+        { familia: 'Arial', peso: 400, url: 'fonts/arial400.woff2' },
     ];
 
     // Área útil do desenho dentro da folha A4 do SVG (sem a margem em branco)
@@ -25,28 +25,27 @@
     // (A bolinha "Feminina" da legenda é vermelho puro, mas as lojas usam outro tom.)
     // Fitness e Pijamas e Lingerie usam a MESMA cor no arquivo, então hoje destacam as mesmas lojas.
     const CATEGORIAS = [
-        { nome: 'Feminina',           cores: ['rgb(205,56,59)'] },
-        { nome: 'Evangélica',         cores: ['rgb(113,203,220)'] },
-        { nome: 'Jeans',              cores: ['rgb(73,92,155)'] },
-        { nome: 'Masculina',          cores: ['rgb(70,118,70)'] },
-        { nome: 'Utilidades',         cores: ['rgb(171,65,127)'] },
-        { nome: 'Plus Size',          cores: ['rgb(248,181,84)'] },
-        { nome: 'Acessórios',         cores: ['rgb(239,135,66)'] },
-        { nome: 'Fitness',            cores: ['rgb(57,161,136)'] },
-        { nome: 'Infantil',           cores: ['rgb(51,49,132)'] },
-        { nome: 'Pijamas e Lingerie', cores: ['rgb(57,161,136)'] },
-        { nome: 'Artigos de Loja',    cores: ['rgb(170,109,87)'] },
-        { nome: 'Agentes de Moda',    cores: ['rgb(215,179,105)'] },
-        { nome: 'Café/Restaurante',   cores: ['rgb(255,199,0)'] },
+        { nome: 'Feminina', cores: ['rgb(205,56,59)'] },
+        { nome: 'Evangélica', cores: ['rgb(113,203,220)'] },
+        { nome: 'Jeans', cores: ['rgb(73,92,155)'] },
+        { nome: 'Masculina', cores: ['rgb(70,118,70)'] },
+        { nome: 'Utilidades', cores: ['rgb(171,65,127)'] },
+        { nome: 'Plus Size', cores: ['rgb(248,181,84)'] },
+        { nome: 'Acessórios', cores: ['rgb(239,135,66)'] },
+        { nome: 'Infantil', cores: ['rgb(51,49,132)'] },
+        { nome: 'Fitness e Pijamas', cores: ['rgb(57,161,136)'], legenda: ['Fitness', 'Pijamas e Lingerie'] },
+        { nome: 'Artigos de Loja', cores: ['rgb(170,109,87)'] },
+        { nome: 'Agentes de Moda', cores: ['rgb(215,179,105)'] },
+        { nome: 'Café/Restaurante', cores: ['rgb(255,199,0)'] },
     ];
     const PAGINA = { w: 29700, h: 21000 };   // folha A4 do SVG original
 
     const MIN_ZOOM = 1;
     const MAX_ZOOM = 8;
 
-    const frame   = document.getElementById('mapaFrame');
-    const btnIn   = document.getElementById('btnZoomIn');
-    const btnOut  = document.getElementById('btnZoomOut');
+    const frame = document.getElementById('mapaFrame');
+    const btnIn = document.getElementById('btnZoomIn');
+    const btnOut = document.getElementById('btnZoomOut');
     const btnFull = document.getElementById('btnFullscreen');
     const btnDown = document.getElementById('btnDownload');
     const barraFiltros = document.getElementById('filtros');
@@ -67,9 +66,9 @@
         const ppu = pxPorUnidade();
         const vw = cw / ppu, vh = ch / ppu;
         cx = vw >= BASE.w ? BASE.x + BASE.w / 2
-                          : Math.max(BASE.x + vw / 2, Math.min(BASE.x + BASE.w - vw / 2, cx));
+            : Math.max(BASE.x + vw / 2, Math.min(BASE.x + BASE.w - vw / 2, cx));
         cy = vh >= BASE.h ? BASE.y + BASE.h / 2
-                          : Math.max(BASE.y + vh / 2, Math.min(BASE.y + BASE.h - vh / 2, cy));
+            : Math.max(BASE.y + vh / 2, Math.min(BASE.y + BASE.h - vh / 2, cy));
     }
 
     function desenhar() {
@@ -89,7 +88,7 @@
         const fp = Math.min(cw / PAGINA.w, ch / PAGINA.h);        // ajuste "contain" da folha inteira
         const ox = (cw - PAGINA.w * fp) / 2;
         const oy = (ch - PAGINA.h * fp) / 2;
-        const k  = ppu / fp;
+        const k = ppu / fp;
         const tx = (-ox / fp - (cx - vw / 2)) * ppu;
         const ty = (-oy / fp - (cy - vh / 2)) * ppu;
         img.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
@@ -153,7 +152,7 @@
 
     const centro = () => ({ x: cw / 2, y: ch / 2 });
 
-    btnIn.addEventListener('click',  () => { const c = centro(); animarPara(zoom * 1.5, c.x, c.y); });
+    btnIn.addEventListener('click', () => { const c = centro(); animarPara(zoom * 1.5, c.x, c.y); });
     btnOut.addEventListener('click', () => { const c = centro(); animarPara(zoom / 1.5, c.x, c.y); });
 
     // ---------- Tela cheia ----------
@@ -378,19 +377,23 @@
     }
 
     function prepararFiltro() {
-        const nomes = new Set(CATEGORIAS.map(c => c.nome));
+        const textoParaCategoria = new Map();
+        CATEGORIAS.forEach(c => (c.legenda || [c.nome]).forEach(t => textoParaCategoria.set(t, c.nome)));
+
         itensLegenda = [];
         let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
 
         svg.querySelectorAll('text').forEach(t => {
-            const nome = t.textContent.replace(/\s+/g, ' ').trim();
-            if (!nomes.has(nome)) return;
+            const texto = t.textContent.replace(/\s+/g, ' ').trim();
+            const nome = textoParaCategoria.get(texto);
+            if (!nome) return;
             const b = t.getBBox();
             itensLegenda.push({ nome, x: b.x - 750, y: b.y - 80, w: b.width + 900, h: b.height + 160 });
             x0 = Math.min(x0, b.x - 800); y0 = Math.min(y0, b.y - 250);
             x1 = Math.max(x1, b.x + b.width + 250); y1 = Math.max(y1, b.y + b.height + 250);
         });
         if (!itensLegenda.length) { itensLegenda = []; return; }
+
         areaLegenda = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
 
         // Formas preenchidas, NA ORDEM DO ARQUIVO (a ordem é o empilhamento: o que vem depois fica por cima).
@@ -405,8 +408,8 @@
             const eLoja = cores.has(f);
             if (!eLoja && (b.width < 350 || b.height < 250)) return;   // ignora letras e filetes
             const dentroLegenda = b.x >= areaLegenda.x && b.y >= areaLegenda.y &&
-                                  b.x + b.width <= areaLegenda.x + areaLegenda.w &&
-                                  b.y + b.height <= areaLegenda.y + areaLegenda.h;
+                b.x + b.width <= areaLegenda.x + areaLegenda.w &&
+                b.y + b.height <= areaLegenda.y + areaLegenda.h;
             if (dentroLegenda) return;
             camadas.push({ fill: f, d: p.getAttribute('d'), x: b.x, y: b.y, w: b.width, h: b.height });
         });
@@ -529,7 +532,7 @@
         for (const f of FONTES) {
             try {
                 css += `@font-face{font-family:"${f.familia}";font-weight:${f.peso};` +
-                       `src:url(data:font/woff2;base64,${await paraBase64(f.url)}) format("woff2");}`;
+                    `src:url(data:font/woff2;base64,${await paraBase64(f.url)}) format("woff2");}`;
             } catch (_) { /* sem essa fonte, o PNG usa a fonte padrão do aparelho */ }
         }
         css += 'tspan[font-family^="Arial"]{font-family:"Arial","Helvetica Neue",Helvetica,"Liberation Sans",Roboto,sans-serif;}';
